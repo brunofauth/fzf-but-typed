@@ -2,7 +2,7 @@
 
 
 tmp_file="$(mktemp --tmpdir)"
-man fzf > "$tmp_file"
+env MANWIDTH=80 man fzf > "$tmp_file"
 
 cd "$(dirname "$0")" || exit 1
 
