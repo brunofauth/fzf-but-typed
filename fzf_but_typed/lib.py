@@ -267,6 +267,14 @@ class Key(StrEnum):
     LEFT_CLICK = "left-click"
     RIGHT_CLICK = "right-click"
     DOUBLE_CLICK = "double-click"
+    SCROLL_UP = "scroll_up"
+    SCROLL_DOWN = "scroll_down"
+    PREVIEW_SCROLL_UP = "preview_scroll_up"
+    PREVIEW_SCROLL_DOWN = "preview_scroll_down"
+    SHIFT_LEFT_CLICK = "shift_left_click"
+    SHIFT_RIGHT_CLICK = "shift_right_click"
+    SHIFT_SCROLL_UP = "shift_scroll_up"
+    SHIFT_SCROLL_DOWN = "shift_scroll_down"
 
 
 @unique
@@ -309,6 +317,8 @@ class ActionSimple(StrEnum):
     HALF_PAGE_DOWN = "half-page-down"
     HALF_PAGE_UP = "half-page-up"
     HIDE_PREVIEW = "hide-preview"
+    OFFSET_DOWN = "offset-down"
+    OFFSET_UP = "offset-up"
     IGNORE = "ignore"
     JUMP = "jump"
     JUMP_ACCEPT = "jump-accept"
@@ -552,6 +562,7 @@ class Sides:
 @unique
 class LayoutInfoStyle(StrEnum):
     DEFAULT = "default"
+    RIGHT = "right"
     INLINE = "inline"
     INLINE_RIGHT = "inline-right"
     HIDDEN = "hidden"
@@ -871,6 +882,7 @@ class ScriptingOptions:
     expect: list[Key] | None = None
     read0: bool = False
     print0: bool = False
+    no_clear: bool = False
     sync: bool = False
     listen: Port | None = None
 
@@ -881,6 +893,7 @@ class ScriptingOptions:
             '--print-query' if self.print_query else '--no-print-query',
             '--read0' if self.read0 else '--no-read0',
             '--print0' if self.print0 else '--no-print0',
+            '--no-clear' if self.no_clear else '--clear',
             '--sync' if self.sync else '--no-sync',
         ]
         if self.query is not None:

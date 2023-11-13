@@ -6,6 +6,7 @@ import subprocess as sp
 def test_compatibility() -> None:
     supported_versions = [
         "0.42.0 (d471067e)",
+        "0.43.0 (d3311d9f)",
     ]
     result = sp.run(['fzf', '--version'], capture_output=True, text=True, check=True)
     v = found_version = result.stdout.strip()

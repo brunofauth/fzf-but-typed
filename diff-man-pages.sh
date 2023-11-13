@@ -6,6 +6,6 @@ man fzf > "$tmp_file"
 
 cd "$(dirname "$0")" || exit 1
 
-diff ./fzf-man-pages "$tmp_file"
+diff --color=always ./fzf-man-pages "$tmp_file"
 rm "$tmp_file"
 
