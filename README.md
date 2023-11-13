@@ -13,7 +13,7 @@
 
 # Introduction
 
-`typed_fzf` is a python wrapper for [fzf](https://github.com/junegunn/fzf/).  
+`fzf_but_typed` is a python wrapper for [fzf](https://github.com/junegunn/fzf/).  
 It's different from other existing wrappers because it wraps all of fzf's CLI 
 options and their possible values into neat types, so that you can leverage 
 your IDE/LSP/type-checker as a means of correctly using fzf, without having to 
@@ -26,11 +26,11 @@ arguments is much more comfortable.
 
 With pip:
 
-    pip install typed_fzf
+    pip install fzf_but_typed
 
 With poetry:
     
-    poetry add typed_fzf
+    poetry add fzf_but_typed
 
 
 # API Overview and Examples
@@ -53,7 +53,7 @@ guide, I'll only mention them when necessary, in appropriate examples.
 Basic Usage:
 
 ```python
-from typed_fzf.lib import fzf, SearchOptions, DisplayOptions, Color, 
+from fzf_but_typed.lib import fzf, SearchOptions, DisplayOptions, Color, 
 
 # Basic usage
 chosen_items = fzf(input_text="first\nsecond\nthird")
@@ -64,7 +64,7 @@ Through `fzf`, you can pass arguments to `FuzzyFinderBuilder` too, as keyword
 arguments, like this:
 
 ```python
-from typed_fzf.lib import (fzf,
+from fzf_but_typed.lib import (fzf,
     SearchOptions, DisplayOptions, Color, BaseColorScheme)
 
 chosen_items = fzf(
@@ -82,7 +82,7 @@ you can pass a list of anything that can be converted into a `str`, as input.
 See the example below
 
 ```python
-from typed_fzf.lib import fzf_iter, Key as SomeStrEnum
+from fzf_but_typed.lib import fzf_iter, Key as SomeStrEnum
 
 a_heterogenous_collection = [
     123123123,
@@ -97,7 +97,7 @@ You can pass keyword arguments to `FuzzyFinderBuilder` through this function
 too, just like you did in `fzf` previously! See the example below
 
 ```python
-from typed_fzf.lib import fzf_iter, InterfaceOptions, ScriptingOptions
+from fzf_but_typed.lib import fzf_iter, InterfaceOptions, ScriptingOptions
 
 a_heterogenous_collection = [123123123, "aaaaaa"]
 chosen = fzf_iter(
@@ -118,7 +118,7 @@ many `*Options` parameters, as well as a `Path` to where your `fzf` binary is
 located (defaults to whatever `shutil.which` returns).
 
 ```python
-from typed_fzf.lib import (FuzzyFinderBuilder, SearchOptions, ResultsOptions,
+from fzf_but_typed.lib import (FuzzyFinderBuilder, SearchOptions, ResultsOptions,
                            DisplayOptions, PreviewOptions, FuzzyFinder,
                            FuzzyFinderOutput, ExitStatusCode)
 
@@ -162,7 +162,7 @@ for item in fzf_output.output:
 ## Going Nuts with All These Features
 
 ```python
-from typed_fzf.lib import (
+from fzf_but_typed.lib import (
     Event, Key, ActionSimple, ActionWithArg, ActionWithArgType,
     ActionArgSeparator, FuzzyFinderBuilder, SearchOptions, ResultsOptions,
     InterfaceOptions, LayoutOptions, LayoutType, BorderType, DisplayOptions,
@@ -227,14 +227,14 @@ compatibility, as described below.
 
 To see if your 'fzf' version is the same as mine, run:
 
-    python -m typed_fzf compatibility
+    python -m fzf_but_typed compatibility
 
 To se if, regardless of the version in question, your fzf's CLI is identical to 
 mine, `clone` this repository, `cd` into it and run `./diff-man-pages.sh`, like 
 this (assuming you're in an unix-like operating system):
 
-    git clone "https://github.com/brunofauth/typed_fzf"
-    cd typed_fzf
+    git clone "https://github.com/brunofauth/fzf_but_typed"
+    cd fzf_but_typed
     ./diff-man-pages.sh
 
 If any features you want to use are missing and that's sufficiently important 

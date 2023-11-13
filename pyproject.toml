@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "typed-fzf"
+name = "fzf_but_typed"
 version = "0.1.0"
 description = "Statically typed API to fzf"
 authors = ["Bruno Fauth <149593@upf.br>"]
@@ -14,11 +14,11 @@ classifiers = [
     "Topic :: System :: Shells",
 ]
 keywords = ["cli", "command-line", "type", "hint", "fzf", "fuzzy", "finder"]
-repository = "https://github.com/brunofauth/typed_fzf"
+repository = "https://github.com/brunofauth/fzf-but-typed"
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/brunofauth/typed_fzf/issues"
-"Homepage" = "https://github.com/brunofauth/typed_fzf"
+"Bug Tracker" = "https://github.com/brunofauth/fzf-but-typed/issues"
+"Homepage" = "https://github.com/brunofauth/fzf-but-typed"
 
 [tool.poetry.dependencies]
 python = "^3.11"
