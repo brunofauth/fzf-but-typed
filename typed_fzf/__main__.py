@@ -116,8 +116,14 @@ def _go_nuts() -> None:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        print("supported args:\n\t'demo'\n\t'compatibility'")
+        raise SystemExit
+
     if sys.argv[1] == "demo":
         _tests()
         _go_nuts()
     elif sys.argv[1] == "compatibility":
         test_compatibility()
+    else:
+        print("supported args:\n\t'demo'\n\t'compatibility'")
