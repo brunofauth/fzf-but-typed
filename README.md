@@ -1,3 +1,16 @@
+# Table of Contents
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [API Overview and Examples](#api-overview-and-examples)
+  * [Main Content](#main-content)
+  * [`fzf` Free Function](#fzf-free-function)
+  * [`fzf_iter` Free Function](#fzf_iter-free-function)
+  * [`FuzzyFinderBuilder` class](#fuzzyfinderbuilder-class)
+  * [Going Nuts with All These Features](#going-nuts-with-all-these-features)
+- [`fzf` Version Compatibility](#fzf-version-compatibility)
+
+
 # Introduction
 
 `typed_fzf` is a python wrapper for [fzf](https://github.com/junegunn/fzf/).  
