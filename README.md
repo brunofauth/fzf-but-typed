@@ -118,9 +118,9 @@ many `*Options` parameters, as well as a `Path` to where your `fzf` binary is
 located (defaults to whatever `shutil.which` returns).
 
 ```python
-from fzf_but_typed.lib import (FuzzyFinderBuilder, SearchOptions, ResultsOptions,
-                           DisplayOptions, PreviewOptions, FuzzyFinder,
-                           FuzzyFinderOutput, ExitStatusCode)
+from fzf_but_typed.lib import (
+    FuzzyFinderBuilder, SearchOptions, ResultsOptions, DisplayOptions,
+    PreviewOptions, FuzzyFinder, FuzzyFinderOutput, ExitStatusCode)
 
 # These keyword arguments are also accepted by the previously mentioned 'fzf'
 # and 'fzf_iter' functions
@@ -196,7 +196,7 @@ builder: FuzzyFinderBuilder = FuzzyFinderBuilder(
     scripting=ScriptingOptions(read0=True, print0=True),
 )
 
-result = builder.build() .run(input_lines="\0".join([
+result = builder.build().run(input_lines="\0".join([
     "aaa a a a aaa a a a a a",
     "bb bw b f b bw b b bf db db  ",
     "cc case_sensitive c c       c c c ccccc",
