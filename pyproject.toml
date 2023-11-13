@@ -5,6 +5,20 @@ description = "Statically typed API to fzf"
 authors = ["Bruno Fauth <149593@upf.br>"]
 license = "MIT"
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Shells",
+]
+keywords = ["cli", "command-line", "type", "hint", "fzf", "fuzzy", "finder"]
+repository = "https://github.com/brunofauth/typed_fzf"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/brunofauth/typed_fzf/issues"
+"Homepage" = "https://github.com/brunofauth/typed_fzf"
 
 [tool.poetry.dependencies]
 python = "^3.11"
