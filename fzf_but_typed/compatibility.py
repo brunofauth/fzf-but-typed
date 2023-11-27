@@ -25,7 +25,7 @@ _ERROR_NEWER = (
 )
 _ERROR_PREVIOUSLY_SUPPORTED = (
     "In your particular case, the version you're using has been supported by a previous "
-    "version of this library, so, if you want, you can downgrade this package to get "
+    "version of this library ({}), so, if you want, you can downgrade this package to get "
     "full compatibility, instead of updating 'fzf'; it's really up to you... "
 )
 _ERROR_EPILOGUE = (
@@ -65,12 +65,13 @@ def _get_installed_fzf_version() -> SemVer:
 def _raise_error(
     my_version: SemVer,
     your_version: SemVer,
-    previously_supported: bool = False,
+    previously_supported: SemVer | None = None,
 ) -> NoReturn:
     raise RuntimeError("".join([
         _ERROR_HEADER.format(my_version=my_version, your_version=your_version),
         _ERROR_NEWER if your_version > my_version else _ERROR_OLDER,
-        _ERROR_PREVIOUSLY_SUPPORTED if previously_supported else "",
+        _ERROR_PREVIOUSLY_SUPPORTED.format(previously_supported)
+        if previously_supported is not None else "",
         _ERROR_EPILOGUE,
     ]))
 
@@ -78,31 +79,44 @@ def _raise_error(
 def _test_compatibility(
     latest_supported: SemVer,
     found_version: SemVer,
-    all_supported_versions: list[SemVer],
+    all_supported_versions: list[tuple[SemVer, SemVer]],
 ) -> NoReturn:
-    index = bisect.bisect(all_supported_versions, found_version)
+    index = bisect.bisect(
+        all_supported_versions,
+        found_version,
+        key=lambda pair: pair[0],
+    )
 
     if index == 0:
         _raise_error(latest_supported, found_version)
+
     if found_version.is_compatible_with(latest_supported):
         print("versions are compatible... you're fine!", file=sys.stderr)
         raise SystemExit()
+
     if index == len(all_supported_versions):
         _raise_error(latest_supported, found_version)
-    if (found_version.is_compatible_with(all_supported_versions[index - 1]) or
-            found_version.is_compatible_with(all_supported_versions[index])):
-        _raise_error(latest_supported, found_version, previously_supported=True)
+
+    prev_fzf_version, prev_lib_version = all_supported_versions[index - 1]
+    if found_version.is_compatible_with(prev_fzf_version):
+        _raise_error(latest_supported, found_version, previously_supported=prev_lib_version)
+
+    prev_fzf_version, prev_lib_version = all_supported_versions[index]
+    if found_version.is_compatible_with(prev_fzf_version):
+        _raise_error(latest_supported, found_version, previously_supported=prev_lib_version)
+
     _raise_error(latest_supported, found_version)
 
 
 def test_compatibility() -> NoReturn:
-    all_supported_versions: list[SemVer] = [
-        SemVer(major=0, minor=42, patch=0),
-        SemVer(major=0, minor=43, patch=0),
+    # Keys are fzf versions; values are this package's versions
+    all_supported_versions: list[tuple[SemVer, SemVer]] = [
+        (SemVer(major=0, minor=42, patch=0), SemVer(major=0, minor=1, patch=0)),
+        (SemVer(major=0, minor=43, patch=0), SemVer(major=0, minor=2, patch=0)),
     ]
-    latest_supported = all_supported_versions[-1]
-    found_version = _get_installed_fzf_version()
-    _test_compatibility(latest_supported, found_version, all_supported_versions)
+    latest_supported_fzf = all_supported_versions[-1][0]
+    found_fzf_version = _get_installed_fzf_version()
+    _test_compatibility(latest_supported_fzf, found_fzf_version, all_supported_versions)
 
 
 if __name__ == "__main__":

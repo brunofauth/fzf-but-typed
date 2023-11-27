@@ -5,15 +5,15 @@ import functools
 
 def test_compatibility_test() -> None:
     mock_all_supported_versions = [
-        SemVer(major=0, minor=1, patch=0),
-        SemVer(major=0, minor=1, patch=1),
-        SemVer(major=0, minor=3, patch=0),
-        SemVer(major=1, minor=3, patch=1),
+        (SemVer(major=0, minor=1, patch=0), SemVer(major=0, minor=1, patch=0)),
+        (SemVer(major=0, minor=1, patch=1), SemVer(major=0, minor=2, patch=0)),
+        (SemVer(major=0, minor=3, patch=0), SemVer(major=0, minor=3, patch=0)),
+        (SemVer(major=1, minor=3, patch=1), SemVer(major=0, minor=4, patch=0)),
     ]
 
     test1 = functools.partial(
         _test_compatibility,
-        latest_supported=mock_all_supported_versions[-1],
+        latest_supported=mock_all_supported_versions[-1][0],
         all_supported_versions=mock_all_supported_versions,
     )
 
