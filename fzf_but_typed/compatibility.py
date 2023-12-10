@@ -12,7 +12,7 @@ _RE_SEMVER = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+).(?P<patch>\d+)\S*')
 
 # yapf: disable
 _ERROR_HEADER = (
-    "The contents of this module were written module taking into consideration the man "
+    "The contents of this module were written taking into consideration the man "
     "pages of fzf version={my_version!s}. You're using fzf version={your_version!s} "
 )
 _ERROR_OLDER = (
@@ -29,7 +29,7 @@ _ERROR_PREVIOUSLY_SUPPORTED = (
     "full compatibility, instead of updating 'fzf'; it's really up to you... "
 )
 _ERROR_EPILOGUE = (
-    "Regardless of all this, your use case might probably be supported by this lib. I've "
+    "Regardless of all this, your use case is probably supported by this lib. I've "
     "included the aformentioned manpages in this package's repo, so, if you want to be 100% "
     " sure, you can download these manpages and run them through 'diff' with your system's "
     "manpages for fzf. See README.md for an example of how to do this."
@@ -51,6 +51,9 @@ class SemVer:
 
     def is_compatible_with(self, other: Self) -> bool:
         return self.major == other.major and self.minor == other.minor
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}.{self.patch}"
 
 
 def _get_installed_fzf_version() -> SemVer:

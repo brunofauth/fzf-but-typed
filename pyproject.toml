@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fzf_but_typed"
-version = "0.2.3"
+version = "0.2.4"
 description = "Statically typed API to fzf"
 authors = ["Bruno Fauth <149593@upf.br>"]
 license = "MIT"
@@ -47,9 +47,6 @@ line-length = 100
 
 [tool.ruff.lint]
 ignore = ["E731", "E701", "E702", "E741"]
-
-[tool.black]
-line-length = 100
 
 # https://github.com/google/yapf
 [tool.yapf]
