@@ -116,6 +116,7 @@ def test_compatibility() -> NoReturn:
     all_supported_versions: list[tuple[SemVer, SemVer]] = [
         (SemVer(major=0, minor=42, patch=0), SemVer(major=0, minor=1, patch=0)),
         (SemVer(major=0, minor=43, patch=0), SemVer(major=0, minor=2, patch=0)),
+        (SemVer(major=0, minor=44, patch=0), SemVer(major=0, minor=3, patch=0)),
     ]
     latest_supported_fzf = all_supported_versions[-1][0]
     found_fzf_version = _get_installed_fzf_version()

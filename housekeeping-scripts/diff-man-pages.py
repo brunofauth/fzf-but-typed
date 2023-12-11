@@ -120,8 +120,13 @@ def top_level_diff(
     new_opt_by_categ = split_by_category(new_opt_lines).drop(1).collect(OrderedDict)
     new_opt_categ = set(new_opt_by_categ.keys())
 
-    print("# VERSION DIFF")
-    print(diff_lines([old_version], [new_version]), '\n\n')
+    if (diff := diff_lines([old_version], [new_version])) is not None:
+        print("# VERSION DIFF")
+        print(diff, '\n\n')
+    else:
+        print('Both versions are the same')
+        print(old_version)
+        return
 
     if len(added := new_opt_categ - old_opt_categ) != 0:
         print("# CATEGORIES ADDED (not gonna diff):")

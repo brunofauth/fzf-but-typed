@@ -873,6 +873,17 @@ class Port(int):
 
 
 @dataclass(slots=True, frozen=True)
+class RemoteHost:
+    address: str | None
+    port: Port
+
+    def __str__(self) -> str:
+        if self.address is None:
+            return f"{self.address}:{self.port}"
+        return str(self.port)
+
+
+@dataclass(slots=True, frozen=True)
 class ScriptingOptions:
     query: str | None = None
     select_1: bool = False
@@ -884,7 +895,8 @@ class ScriptingOptions:
     print0: bool = False
     no_clear: bool = False
     sync: bool = False
-    listen: Port | None = None
+    listen: RemoteHost | None = None
+    listen_unsafe: RemoteHost | None = None
 
     def as_args(self) -> list[str]:
         args = [
@@ -902,6 +914,8 @@ class ScriptingOptions:
             args.append(f'--filter={self.filter}')
         if self.listen is not None:
             args.append(f'--listen={self.listen}')
+        if self.listen_unsafe is not None:
+            args.append(f'--listen-unsafe={self.listen_unsafe}')
         if self.expect is not None:
             args.append(f'--expect={",".join(self.expect)}')
         return args
