@@ -1,4 +1,7 @@
-.PHONY: clean man-diff man-update demo test-version test-code
+REPO_ROOT := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+
+
+.PHONY: clean build install man-diff man-update demo test-version test-code
 
 
 clean:
@@ -7,8 +10,12 @@ clean:
 build:
 	@poetry build --format=sdist
 
+install:
+	@poetry install
+
 man-diff:
-	@./housekeeping-scripts/diff-man-pages.sh
+	@poetry run python ./housekeeping-scripts/diff-man-pages.py \
+		$(REPO_ROOT)/fzf.1.man
 
 man-update:
 	@./housekeeping-scripts/update-man-pages.sh

@@ -230,12 +230,12 @@ To see if your 'fzf' version is the same as mine, run:
     python -m fzf_but_typed compatibility
 
 To se if, regardless of the version in question, your fzf's CLI is identical to 
-mine, `clone` this repository, `cd` into it and run `./diff-man-pages.sh`, like 
-this (assuming you're in an unix-like operating system):
+mine, `clone` this repository, `cd` into it and run ` make man-diff`, like this 
+(assuming you're in an unix-like operating system):
 
     git clone "https://github.com/brunofauth/fzf_but_typed"
     cd fzf_but_typed
-    ./diff-man-pages.sh
+    make man-diff
 
 If any features you want to use are missing and that's sufficiently important 
 to you, you can clone this repo, add that functionality and submit a pull 
