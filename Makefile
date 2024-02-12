@@ -1,7 +1,7 @@
 REPO_ROOT := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 
-.PHONY: clean build install man-diff man-update demo test-version test-code
+.PHONY: clean build install man-diff man-update demo test
 
 
 clean:
@@ -21,10 +21,7 @@ man-update:
 	@./housekeeping-scripts/update-man-pages.sh
 
 demo:
-	@poetry run python -m fzf_but_typed demo
+	@poetry run python -m fzf_but_typed
 
-test-version:
-	@poetry run python -m fzf_but_typed compatibility
-
-test-code:
+test:
 	@poetry run pytest

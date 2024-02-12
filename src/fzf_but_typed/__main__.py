@@ -27,7 +27,6 @@ from .lib import (
     ScriptingOptions,
 )
 
-from .compatibility import test_compatibility
 import sys
 
 
@@ -72,19 +71,22 @@ def _tests():
 
 def _go_nuts() -> None:
     binds = [
-        Binding(Event.ONE, [ActionSimple.ACCEPT]),
-        Binding(Key.CTRL_R, [
-            ActionWithArg(
-                action_type=ActionWithArgType.CHANGE_PREVIEW_WINDOW,
-                argument="right,70%|top,60%",
-            ),
-            ActionWithArg(
-                action_type=ActionWithArgType.EXECUTE,
-                argument="notify-send {} -t 3000",
-                separator=ActionArgSeparator.PERCENT,
-            ),
-            ActionSimple.FIRST,
-        ])
+        Binding(binding=Event.ONE, actions=[ActionSimple.ACCEPT]),
+        Binding(
+            binding=Key.CTRL_R,
+            actions=[
+                ActionWithArg(
+                    action_type=ActionWithArgType.CHANGE_PREVIEW_WINDOW,
+                    argument="right,70%|top,60%",
+                ),
+                ActionWithArg(
+                    action_type=ActionWithArgType.EXECUTE,
+                    argument="notify-send {} -t 3000",
+                    separator=ActionArgSeparator.PERCENT,
+                ),
+                ActionSimple.FIRST,
+            ],
+        )
     ]
 
     builder: FuzzyFinderBuilder = FuzzyFinderBuilder(
@@ -116,14 +118,5 @@ def _go_nuts() -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        print("supported args:\n\t'demo'\n\t'compatibility'")
-        raise SystemExit
-
-    if sys.argv[1] == "demo":
-        _tests()
-        _go_nuts()
-    elif sys.argv[1] == "compatibility":
-        test_compatibility()
-    else:
-        print("supported args:\n\t'demo'\n\t'compatibility'")
+    _tests()
+    _go_nuts()

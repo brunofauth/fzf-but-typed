@@ -6,6 +6,7 @@ from enum import unique, StrEnum, auto as enum_auto, Enum, IntEnum
 from pathlib import Path
 from typing import NewType, TypeAlias, Protocol
 from itertools import starmap
+from functools import partial
 
 import shutil
 import itertools
@@ -1031,10 +1032,14 @@ def _join_kv(key: SupportsStr, val: SupportsStr, delimiter: str = ':') -> str:
 
 
 def fzf_pairs(input: Iterable[tuple[SupportsStr, SupportsStr]], **options) -> list[str]:
+    KEY_INDEX = 1
+    VAL_INDEX = 2
+    KV_SEP = ':'
+
     if not hasattr(options, "search"):
         options["search"] = SearchOptions()
-    options["search"].with_nth = [2]
-    options["search"].delimiter = ':'
+    options["search"].with_nth = [VAL_INDEX]
+    options["search"].delimiter = KV_SEP
 
     builder = FuzzyFinderBuilder(**options)
     try:
@@ -1042,9 +1047,10 @@ def fzf_pairs(input: Iterable[tuple[SupportsStr, SupportsStr]], **options) -> li
     except AttributeError:
         line_sep = '\n'
 
-    input_text = line_sep.join(starmap(_join_kv, input))
+    input_text = line_sep.join(starmap(partial(_join_kv, delimiter=KV_SEP), input))
     try:
-        return builder.build().run(input_text, check=True).output
+        raw_output = builder.build().run(input_text, check=True).output
+        return [line.split(KV_SEP, maxsplit=1)[KEY_INDEX] for line in raw_output]
     except sp.CalledProcessError as error:
         print(f"fzf returned status code: {ExitStatusCode(value=error.returncode).name}")
         raise
