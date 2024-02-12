@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from dataclasses import dataclass, field
+from collections.abc import Iterable, Mapping, ItemsView
+from dataclasses import dataclass, field, asdict
 from enum import unique, StrEnum, auto as enum_auto, Enum, IntEnum
 from pathlib import Path
 from typing import NewType, TypeAlias, Protocol
+from itertools import starmap
 
 import shutil
 import itertools
@@ -14,6 +15,8 @@ __all__ = [
    # Main Content
     'fzf',
     'fzf_iter',
+    'fzf_pairs',
+    'fzf_mapping',
     'FuzzyFinder',
     'FuzzyFinderBuilder',
     'FuzzyFinderOutput',
@@ -93,26 +96,21 @@ class SearchAlgorithm(StrEnum):
     V2 = 'v2'
 
 
-@dataclass(slots=True, frozen=True)
-class FieldIndexExpression:
+@dataclass(slots=True, kw_only=True)
+class UnboundedRange:
     upper: int | None
     lower: int | None
 
     def __str__(self) -> str:
-        match (self.upper, self.lower):
-            case (None, None):
-                return '..'
-            case (some, None):
-                return f'{some}..'
-            case (None, some):
-                return f'..{some}'
-            case (some1, some2):
-                return f'{some1}..{some2}'
-            case _:
-                raise NotImplementedError()
+        upper_bound = '' if self.upper is None else self.upper
+        lower_bound = '' if self.lower is None else self.lower
+        return f"{lower_bound}..{upper_bound}"
 
 
-@dataclass(slots=True, frozen=True)
+FieldIndexExpression = int | UnboundedRange
+
+
+@dataclass(slots=True, kw_only=True)
 class SearchOptions:
     extended: bool = True   # --extended --no-extended
     exact: bool = False   # --exact
@@ -153,7 +151,7 @@ class SearchTiebreak(StrEnum):
     INDEX = "index"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class ResultsOptions:
     sort: bool = True   # +s --no-sort
     track: bool = False   # --track
@@ -454,7 +452,7 @@ class ActionArgSeparator(Enum):
             # yapf: enable
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class ActionWithArg:
     action_type: ActionWithArgType
     argument: str
@@ -469,7 +467,7 @@ class ActionWithArg:
         ])
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class Binding:
     binding: Key | Event
     actions: list[ActionSimple | ActionWithArg]
@@ -478,7 +476,7 @@ class Binding:
         return f"{self.binding}:{'+'.join(str(a) for a in self.actions)}"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class InterfaceOptions:
     multi: bool = False   # --multi --no-multi
     no_mouse: bool = False   # --no-mouse
@@ -543,7 +541,16 @@ class Percent(float):
         return super().__str__() + "%"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
+class Height:
+    value: Pixels | Percent
+    adaptive: bool = False
+
+    def __str__(self) -> str:
+        return ("~" if self.adaptive else "") + str(self.value)
+
+
+@dataclass(slots=True, kw_only=True)
 class Sides:
     top: Pixels | Percent = Pixels(0)
     bottom: Pixels | Percent = Pixels(0)
@@ -574,7 +581,7 @@ class LabelSide(StrEnum):
     BOTTOM = "bottom"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class LabelPosition:
     offset: int = 0
     side: LabelSide = LabelSide.TOP
@@ -583,9 +590,9 @@ class LabelPosition:
         return f"{self.offset}:{self.side}"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class LayoutOptions:
-    height: Pixels | Percent | None = None   # Missing: tilde prefix ~
+    height: Height | None = None
     min_height: Pixels = Pixels(10)
     layout: LayoutType = LayoutType.DEFAULT
     border: BorderType = BorderType.ROUNDED
@@ -702,7 +709,7 @@ class AnsiColor256(int):
         super.__init__(value)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class AnsiColorRgb:
     r: AnsiColor256
     g: AnsiColor256
@@ -735,7 +742,7 @@ class AnsiAttribute(StrEnum):
     STRIKETHROUGH = "strikethrough"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class ColorMapping:
     color_name: ColorName
     ansi_color: AnsiColor | None = None
@@ -750,7 +757,7 @@ class ColorMapping:
         return ":".join(parts)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class Color:
     base_scheme: BaseColorScheme
     mappings: list[ColorMapping] | None = None
@@ -764,7 +771,7 @@ class Color:
         ])
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class DisplayOptions:
     ansi: bool = False
     tabstop: int = 8
@@ -784,7 +791,7 @@ class DisplayOptions:
         return args
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class HistoryOptions:
     history: Path | str | None = None
     history_size: int = 1000
@@ -845,7 +852,7 @@ class PreviewWindowBorderType(StrEnum):
 #     hidden: bool = False
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class PreviewOptions:
     preview_command: str | None = None   # --preview
     preview_label: PreviewLabel = PreviewLabel.BORDER_ROUNDED
@@ -872,7 +879,7 @@ class Port(int):
         return int.__new__(cls, value)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class RemoteHost:
     address: str | None
     port: Port
@@ -883,7 +890,7 @@ class RemoteHost:
         return str(self.port)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class ScriptingOptions:
     query: str | None = None
     select_1: bool = False
@@ -927,7 +934,7 @@ def _resolve_fzf_path() -> str:
     raise FileNotFoundError("could't find 'fzf' binary in $PATH. is it even installed?")
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class FuzzyFinderBuilder:
     binary_path: Path | str = field(default_factory=_resolve_fzf_path)
     search: SearchOptions | None = None
@@ -970,13 +977,13 @@ class ExitStatusCode(IntEnum):
     USER_INTERRUPTED = 130
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class FuzzyFinderOutput:
     exit_status_code: ExitStatusCode
     output: list[str]
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class FuzzyFinder:
     binary_path: Path | str
     args: Iterable[str] = field(default_factory=list)
@@ -1017,3 +1024,31 @@ def fzf_iter(input: Iterable[SupportsStr], **options) -> list[str]:
     except sp.CalledProcessError as error:
         print(f"fzf returned status code: {ExitStatusCode(value=error.returncode).name}")
         raise
+
+
+def _join_kv(key: SupportsStr, val: SupportsStr, delimiter: str = ':') -> str:
+    return f"{key}{delimiter}{val}"
+
+
+def fzf_pairs(input: Iterable[tuple[SupportsStr, SupportsStr]], **options) -> list[str]:
+    if not hasattr(options, "search"):
+        options["search"] = SearchOptions()
+    options["search"].with_nth = [2]
+    options["search"].delimiter = ':'
+
+    builder = FuzzyFinderBuilder(**options)
+    try:
+        line_sep = '\0' if builder.scripting.read0 else '\n'   # type: ignore
+    except AttributeError:
+        line_sep = '\n'
+
+    input_text = line_sep.join(starmap(_join_kv, input))
+    try:
+        return builder.build().run(input_text, check=True).output
+    except sp.CalledProcessError as error:
+        print(f"fzf returned status code: {ExitStatusCode(value=error.returncode).name}")
+        raise
+
+
+def fzf_mapping(input: Mapping[SupportsStr, SupportsStr], **options) -> list[str]:
+    return fzf_pairs(input.items())

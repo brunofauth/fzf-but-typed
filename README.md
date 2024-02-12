@@ -1,3 +1,7 @@
+<!--
+    vim: nospell
+-->
+
 # Table of Contents
 
 - [Introduction](#introduction)
@@ -40,6 +44,8 @@ With poetry:
 The following items are the bread and butter of this package:
 -  `fzf` (free function)
 -  `fzf_iter` (free function)
+-  `fzf_pairs` (free function)
+-  `fzf_mapping` (free function)
 -  `FuzzyFinder` (class)
 -  `FuzzyFinderBuilder` (class)
 -  `FuzzyFinderOutput` (class)
@@ -53,7 +59,7 @@ guide, I'll only mention them when necessary, in appropriate examples.
 Basic Usage:
 
 ```python
-from fzf_but_typed.lib import fzf, SearchOptions, DisplayOptions, Color, 
+from fzf_but_typed import fzf, SearchOptions, DisplayOptions, Color, 
 
 # Basic usage
 chosen_items = fzf(input_text="first\nsecond\nthird")
@@ -64,7 +70,7 @@ Through `fzf`, you can pass arguments to `FuzzyFinderBuilder` too, as keyword
 arguments, like this:
 
 ```python
-from fzf_but_typed.lib import (fzf,
+from fzf_but_typed import (fzf,
     SearchOptions, DisplayOptions, Color, BaseColorScheme)
 
 chosen_items = fzf(
@@ -82,7 +88,7 @@ you can pass a list of anything that can be converted into a `str`, as input.
 See the example below
 
 ```python
-from fzf_but_typed.lib import fzf_iter, Key as SomeStrEnum
+from fzf_but_typed import fzf_iter, Key as SomeStrEnum
 
 a_heterogenous_collection = [
     123123123,
@@ -97,7 +103,7 @@ You can pass keyword arguments to `FuzzyFinderBuilder` through this function
 too, just like you did in `fzf` previously! See the example below
 
 ```python
-from fzf_but_typed.lib import fzf_iter, InterfaceOptions, ScriptingOptions
+from fzf_but_typed import fzf_iter, InterfaceOptions, ScriptingOptions
 
 a_heterogenous_collection = [123123123, "aaaaaa"]
 chosen = fzf_iter(
@@ -109,6 +115,53 @@ chosen = fzf_iter(
 print("you chose:", chosen[0])
 ```
 
+
+## `fzf_pairs` and `fzf_mapping` Free Functions
+
+Sometimes you may want your users to be able to select from the values of a 
+mapping and get those values' keys back. For that use case, you can employ 
+`fzf_mapping`, like this:
+
+```python
+from fzf_but_typed import fzf_mapping
+
+some_dict = {
+    "aaaaa": 22,
+    "bbbbb": 33,
+    12345: "option_number_three",
+}
+
+# This works with any object that is compatible with:
+#     Mapping[SupportsStr, SupportsStr]
+# Where 'SupportsStr' is anything that implements '__str__'
+key = fzf_mapping(input=some_dict)[0]
+
+assert key in some_dict
+print("you chose:", some_dict[key])
+```
+
+Similarly, you can use `fzf_pairs` to do the same thing as above, but passing 
+in an iterable of tuples of strings:
+
+```python
+from fzf_but_typed import fzf_pairs
+
+some_data = [
+    ("aaaaa", 22),
+    ("bbbbb", 33),
+    (12345, "option_number_three"),
+]
+
+# This works with any object that is compatible with:
+#     Iterable[tuple[SupportsStr, SupportsStr]]
+# Where 'SupportsStr' is anything that implements '__str__'
+key = fzf_mapping(input=some_dict)[0]
+
+assert key in some_dict
+print("you chose:", some_data[key])
+```
+
+
 ## `FuzzyFinderBuilder` class
 
 Using `FuzzyFinderBuilder` (instead of `fzf` or `fzf_iter`) allows you to cache 
@@ -118,7 +171,7 @@ many `*Options` parameters, as well as a `Path` to where your `fzf` binary is
 located (defaults to whatever `shutil.which` returns).
 
 ```python
-from fzf_but_typed.lib import (
+from fzf_but_typed import (
     FuzzyFinderBuilder, SearchOptions, ResultsOptions, DisplayOptions,
     PreviewOptions, FuzzyFinder, FuzzyFinderOutput, ExitStatusCode)
 
@@ -162,7 +215,7 @@ for item in fzf_output.output:
 ## Going Nuts with All These Features
 
 ```python
-from fzf_but_typed.lib import (
+from fzf_but_typed import (
     Event, Key, ActionSimple, ActionWithArg, ActionWithArgType,
     ActionArgSeparator, FuzzyFinderBuilder, SearchOptions, ResultsOptions,
     InterfaceOptions, LayoutOptions, LayoutType, BorderType, DisplayOptions,
@@ -215,29 +268,19 @@ for item in result.output:
 
 # `fzf` Version Compatibility
 
+Starting from version `0.45.0`, this library's major and minor version numbers 
+match those of fzf; that is: `fzf` version `0.45.X` is compatible with 
+`fzf_but_typed` version `0.45.Y`.
+
 The contents of this package are based on the informations avaliable on my 
 system's man pages for fzf. If your version of fzf is older than mine, some of 
 the features exposed on this API may not work. Conversely, if it's newer than 
 mine, some features you may want to use may be absent here. Regardless, your 
-use case is probably supported by this lib. I've included the aformentioned 
-manpages in this package's repo, so, if you want to be 100% sure, you can 
-download these manpages and run them through 'diff' with your system's manpages 
-for fzf. Furthermore I've included a few CLI utilities for you to test said 
-compatibility, as described below.
+use case is probably supported by this lib.
 
-To see if your 'fzf' version is the same as mine, run:
 
-    python -m fzf_but_typed compatibility
-
-To se if, regardless of the version in question, your fzf's CLI is identical to 
-mine, `clone` this repository, `cd` into it and run ` make man-diff`, like this 
-(assuming you're in an unix-like operating system):
-
-    git clone "https://github.com/brunofauth/fzf_but_typed"
-    cd fzf_but_typed
-    make man-diff
+# Missing Features and Contributing
 
 If any features you want to use are missing and that's sufficiently important 
 to you, you can clone this repo, add that functionality and submit a pull 
 request. I'll be glad to take in contributions!
-
