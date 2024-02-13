@@ -600,6 +600,7 @@ class LayoutOptions:
     border_label: str | None = None   # --border-label
     border_label_pos: LabelPosition = LabelPosition()
     no_unicode: bool = False   # --no-unicode
+    ambidouble: bool = False
     margin: Sides = Sides()
     padding: Sides = Sides()
     info: LayoutInfoStyle = LayoutInfoStyle.DEFAULT
@@ -620,6 +621,7 @@ class LayoutOptions:
             f'--border={self.border}',
             f'--border-label-pos={self.border_label_pos}',
             '--no-unicode' if self.no_unicode else '--unicode',
+            '--ambidouble' if self.ambidouble else '--no-ambidouble',
             f'--margin={self.margin}',
             f'--padding={self.padding}',
             f'--info={self.info}',

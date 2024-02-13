@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fzf_but_typed"
-version = "0.45.0"
+version = "0.46.0"
 description = "Statically typed API to fzf"
 authors = ["Bruno Fauth <149593@upf.br>"]
 license = "MIT"
