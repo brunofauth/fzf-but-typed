@@ -12,7 +12,7 @@ build:
 
 publish:
 	@make build
-	@twine upload --repository pypi --skip-existing --verbose --username __token__ --password (pass pypi.org/token) dist/* 
+	@twine upload --repository pypi --skip-existing --verbose --username __token__ --password $(shell /bin/sh -c 'pass pypi.org/token | head -n 1') dist/* 
 
 install:
 	@poetry install
