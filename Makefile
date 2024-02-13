@@ -10,6 +10,10 @@ clean:
 build:
 	@poetry build --format=sdist
 
+publish:
+	@make build
+	@twine upload --repository pypi --skip-existing --verbose --username __token__ --password (pass pypi.org/token) dist/* 
+
 install:
 	@poetry install
 
