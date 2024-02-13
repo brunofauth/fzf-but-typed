@@ -1052,7 +1052,7 @@ def fzf_pairs(input: Iterable[tuple[SupportsStr, SupportsStr]], **options) -> li
     input_text = line_sep.join(starmap(partial(_join_kv, delimiter=KV_SEP), input))
     try:
         raw_output = builder.build().run(input_text, check=True).output
-        return [line.split(KV_SEP, maxsplit=1)[KEY_INDEX] for line in raw_output]
+        return [line.split(KV_SEP, maxsplit=1)[KEY_INDEX - 1] for line in raw_output]
     except sp.CalledProcessError as error:
         print(f"fzf returned status code: {ExitStatusCode(value=error.returncode).name}")
         raise
