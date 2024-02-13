@@ -97,7 +97,7 @@ class SearchAlgorithm(StrEnum):
     V2 = 'v2'
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class UnboundedRange:
     upper: int | None
     lower: int | None
@@ -453,7 +453,7 @@ class ActionArgSeparator(Enum):
             # yapf: enable
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class ActionWithArg:
     action_type: ActionWithArgType
     argument: str
@@ -468,7 +468,7 @@ class ActionWithArg:
         ])
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class Binding:
     binding: Key | Event
     actions: list[ActionSimple | ActionWithArg]
@@ -542,7 +542,7 @@ class Percent(float):
         return super().__str__() + "%"
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class Height:
     value: Pixels | Percent
     adaptive: bool = False
@@ -551,7 +551,7 @@ class Height:
         return ("~" if self.adaptive else "") + str(self.value)
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class Sides:
     top: Pixels | Percent = Pixels(0)
     bottom: Pixels | Percent = Pixels(0)
@@ -582,7 +582,7 @@ class LabelSide(StrEnum):
     BOTTOM = "bottom"
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class LabelPosition:
     offset: int = 0
     side: LabelSide = LabelSide.TOP
@@ -712,7 +712,7 @@ class AnsiColor256(int):
         super.__init__(value)
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class AnsiColorRgb:
     r: AnsiColor256
     g: AnsiColor256
@@ -745,7 +745,7 @@ class AnsiAttribute(StrEnum):
     STRIKETHROUGH = "strikethrough"
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class ColorMapping:
     color_name: ColorName
     ansi_color: AnsiColor | None = None
@@ -760,7 +760,7 @@ class ColorMapping:
         return ":".join(parts)
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class Color:
     base_scheme: BaseColorScheme
     mappings: list[ColorMapping] | None = None
@@ -882,7 +882,7 @@ class Port(int):
         return int.__new__(cls, value)
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class RemoteHost:
     address: str | None
     port: Port
@@ -980,13 +980,13 @@ class ExitStatusCode(IntEnum):
     USER_INTERRUPTED = 130
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class FuzzyFinderOutput:
     exit_status_code: ExitStatusCode
     output: list[str]
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class FuzzyFinder:
     binary_path: Path | str
     args: Iterable[str] = field(default_factory=list)
@@ -1052,7 +1052,7 @@ def fzf_pairs(input: Iterable[tuple[SupportsStr, SupportsStr]], **options) -> li
     input_text = line_sep.join(starmap(partial(_join_kv, delimiter=KV_SEP), input))
     try:
         raw_output = builder.build().run(input_text, check=True).output
-        return [line.split(KV_SEP, maxsplit=1)[KEY_INDEX] for line in raw_output]
+        return [line.split(KV_SEP, maxsplit=1)[KEY_INDEX - 1] for line in raw_output]
     except sp.CalledProcessError as error:
         print(f"fzf returned status code: {ExitStatusCode(value=error.returncode).name}")
         raise
