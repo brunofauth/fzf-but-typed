@@ -75,6 +75,10 @@ __all__ = [
    # Scripting Options
     'Port',
     'ScriptingOptions',
+
+   # Directory Traversal Options
+    'TraversalBehavior',
+    'DirectoryTraversalOptions'
 ]
 
 
@@ -933,6 +937,47 @@ class ScriptingOptions:
         return args
 
 
+@unique
+class TraversalBehavior(StrEnum):
+    FILE = "file"
+    DIR = "dir"
+    FOLLOW = "follow"
+    HIDDEN = "hidden"
+
+
+@dataclass(slots=True, kw_only=True)
+class DirectoryTraversalOptions:
+    walker: set[TraversalBehavior] | None = None
+    walker_root: str | Path | None = None
+    walker_skip: Iterable[str | Path] | None = None
+
+    def as_args(self) -> list[str]:
+        args = []
+        if self.walker is not None:
+            args.append(f'--walker={",".join(self.walker)}')
+        if self.walker_root is not None:
+            args.append(f'--walker-root={self.walker_root!s}')
+        if self.walker_skip is not None:
+            args.append(f'--walker-skip={",".join(map(str, self.walker_skip))}')
+        return args
+
+
+@unique
+class Shell(StrEnum):
+    BASH = "bash"
+    ZSH = "zsh"
+    FISH = "fish"
+
+
+@dataclass(slots=True, kw_only=True)
+class ShellIntegrationOptions:
+    shell: Shell | None = None
+
+    def as_args(self) -> list[str]:
+        if self.shell is not None:
+            return [str(self.shell)]
+
+
 def _resolve_fzf_path() -> str:
     if (p := shutil.which('fzf')) is not None:
         return p
@@ -950,6 +995,8 @@ class FuzzyFinderBuilder:
     history: HistoryOptions | None = None
     preview: PreviewOptions | None = None
     scripting: ScriptingOptions | None = None
+    directory_traversal: DirectoryTraversalOptions | None = None
+    shell_integration: ShellIntegrationOptions | None = None
 
     def build(self) -> FuzzyFinder:
         args = itertools.chain(
@@ -961,6 +1008,8 @@ class FuzzyFinderBuilder:
             () if self.history is None else self.history.as_args(),
             () if self.preview is None else self.preview.as_args(),
             () if self.scripting is None else self.scripting.as_args(),
+            () if self.directory_traversal is None else self.directory_traversal.as_args(),
+            () if self.shell_integration is None else self.shell_integration.as_args(),
         )
         if self.scripting is not None and self.scripting.print0:
             _output_sep = '\0'
