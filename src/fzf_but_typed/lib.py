@@ -306,6 +306,7 @@ class ActionSimple(StrEnum):
     BACKWARD_WORD = "backward-word"
     BEGINNING_OF_LINE = "beginning-of-line"
     CANCEL = "cancel"
+    CHANGE_MULTI = "change-multi"
     CLEAR_QUERY = "clear-query"
     CLEAR_SCREEN = "clear-screen"
     CLEAR_SELECTION = "clear-selection"
@@ -379,6 +380,7 @@ class ActionWithArgType(StrEnum):
     BECOME = "become"
     CHANGE_BORDER_LABEL = "change-border-label"
     CHANGE_HEADER = "change-header"
+    CHANGE_MULTI = "change-multi"
     CHANGE_PREVIEW = "change-preview"
     CHANGE_PREVIEW_LABEL = "change-preview-label"
     CHANGE_PREVIEW_WINDOW = "change-preview-window"
@@ -916,6 +918,7 @@ class ScriptingOptions:
     print0: bool = False
     no_clear: bool = False
     sync: bool = False
+    with_shell: str | None = None
     listen: RemoteHost | None = None
     listen_unsafe: RemoteHost | None = None
 
@@ -939,6 +942,8 @@ class ScriptingOptions:
             args.append(f'--listen-unsafe={self.listen_unsafe}')
         if self.expect is not None:
             args.append(f'--expect={",".join(self.expect)}')
+        if self.with_shell is not None:
+            args.append(f'--with-shell={self.with_shell}')
         return args
 
 
