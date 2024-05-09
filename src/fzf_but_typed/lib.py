@@ -280,6 +280,8 @@ class Key(StrEnum):
 class Event(StrEnum):
     START = "start"
     LOAD = "load"
+    RESIZE = "resize"
+    RESULT = "result"
     CHANGE = "change"
     FOCUS = "focus"
     ONE = "one"
