@@ -22,15 +22,6 @@ publish:
 install:
 	@poetry install
 
-.PHONY: man-diff
-man-diff:
-	@poetry run python ./housekeeping-scripts/diff-man-pages.py \
-		$(REPO_ROOT)/fzf.1.man
-
-.PHONY: man-update
-man-update:
-	@./housekeeping-scripts/update-man-pages.sh
-
 .PHONY: demo
 demo:
 	@poetry run python -m fzf_but_typed
