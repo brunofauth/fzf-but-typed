@@ -290,6 +290,8 @@ class Event(StrEnum):
     FOCUS = "focus"
     ONE = "one"
     BACKWARD_EOF = "backward-eof"
+    JUMP = "jump"
+    JUMP_CANCEL = "jump-cancel"
 
 
 @unique
