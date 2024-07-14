@@ -292,6 +292,7 @@ class Event(StrEnum):
     BACKWARD_EOF = "backward-eof"
     JUMP = "jump"
     JUMP_CANCEL = "jump-cancel"
+    CLICK_HEADER = "click-header"
 
 
 @unique
@@ -664,10 +665,13 @@ class LayoutOptions:
 @unique
 class ColorName(StrEnum):
     FG = "fg"
+    SELECTED_FG = "selected-fg"
     PREVIEW_FG = "preview-fg"
     BG = "bg"
+    SELECTED_BG = "selected-bg"
     PREVIEW_BG = "preview-bg"
     HL = "hl"
+    SELECTED_HL = "selected-hl"
     FG_CURRENT_LINE = "fg+"
     BG_CURRENT_LINE = "bg+"
     GUTTER = "gutter"
@@ -792,6 +796,7 @@ class DisplayOptions:
     ansi: bool = False
     tabstop: int = 8
     color: Color | None = None
+    highlight_line: bool = False
     no_bold: bool = False
     black: bool = False
 
@@ -799,6 +804,7 @@ class DisplayOptions:
         args = [
             '--ansi' if self.ansi else '--no-ansi',
             f'--tabstop={self.tabstop}',
+            '--highlight-line' if self.highlight_line else '--no-highlight-line',
             '--no-bold' if self.no_bold else '--bold',
             '--black' if self.black else '--no-black',
         ]
