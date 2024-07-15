@@ -44,6 +44,8 @@ __all__ = [
     'Binding',
 
    # Layout Options
+    'TmuxPosition',
+    'TmuxSettings',
     'LayoutType',
     'BorderType',
     'Percent',
@@ -159,17 +161,21 @@ class SearchTiebreak(StrEnum):
 @dataclass(slots=True, kw_only=True)
 class ResultsOptions:
     sort: bool = True   # +s --no-sort
+    tail: int | None = None
     track: bool = False   # --track
     tac: bool = False   # --tac
     tiebreak: tuple[SearchTiebreak, ...] = (SearchTiebreak.LENGTH, SearchTiebreak.INDEX)
 
     def as_args(self) -> list[str]:
-        return [
+        args = [
             "+s" if self.sort else "--no-sort",
             "--track" if self.track else "--no-track",
             "--tac" if self.tac else "--no-tac",
             f"--tiebreak={','.join(self.tiebreak)}",
         ]
+        if self.tail is not None:
+            args.append(f"--tail={self.tail}")
+        return args
 
 
 @unique
@@ -391,6 +397,7 @@ class ActionWithArgType(StrEnum):
     EXECUTE_SILENT = "execute-silent"
     POS = "pos"
     PREVIEW = "preview"
+    PRINT = "print"
     PUT = "put"
     REBIND = "rebind"
     RELOAD = "reload"
@@ -498,7 +505,7 @@ class InterfaceOptions:
     bind: list[Binding] | None = None   # --bind
     cycle: bool = False   # --cycle
     keep_right: bool = False   # --keep-right
-    scroll_off: int = 0   # --scroll-off
+    scroll_off: int = 3   # --scroll-off
     no_hscroll: bool = False   # --no-hscroll
     hscroll_off: int = 10   # --hscroll-off
     filepath_word: bool = False   # --filepath-word
@@ -521,6 +528,49 @@ class InterfaceOptions:
         if self.jump_labels is not None:
             args.append(f'--jump-labels={",".join(self.jump_labels)}')
         return args
+
+
+@unique
+class TmuxPosition(StrEnum):
+    CENTER = "center"
+    TOP = "top"
+    BOTTOM = "bottom"
+    LEFT = "left"
+    RIGHT = "right"
+
+    def default_width(self) -> Pixels | Percent:
+        TP = TmuxPosition
+        match self:
+            case TP.CENTER | TP.LEFT | TP.RIGHT:
+                return Percent(50)
+            case TP.TOP | TP.BOTTOM:
+                return Percent(100)
+            case other:
+                raise RuntimeError(f"No default width known for: {other}")
+
+    def default_height(self) -> Pixels | Percent:
+        TP = TmuxPosition
+        match self:
+            case TP.CENTER | TP.TOP | TP.BOTTOM:
+                return Percent(50)
+            case TP.LEFT | TP.RIGHT:
+                return Percent(100)
+            case other:
+                raise RuntimeError(f"No default height known for: {other}")
+
+
+@dataclass(slots=True, kw_only=True, frozen=True)
+class TmuxSettings:
+    position: TmuxPosition = TmuxPosition.CENTER
+    width: Pixels | Percent | None = None
+    height: Pixels | Percent | None = None
+
+    def __str__(self) -> str:
+        return ",".join([
+            position,
+            TmuxPosition.default_width() if width is None else width,
+            TmuxPosition.default_height() if height is None else height,
+        ])
 
 
 @unique
@@ -609,6 +659,7 @@ class LabelPosition:
 class LayoutOptions:
     height: Height | None = None
     min_height: Pixels = Pixels(10)
+    tmux: TmuxSettings | None = None
     layout: LayoutType = LayoutType.DEFAULT
     border: BorderType = BorderType.ROUNDED
     border_label: str | None = None   # --border-label
@@ -623,6 +674,7 @@ class LayoutOptions:
     prompt: str | None = None
     pointer: str | None = None
     marker: str | None = None
+    marker_multi_line: str | None = None
     header: str | None = None
     header_lines: int = 0   # --header-lines
     header_first: bool = False
@@ -645,6 +697,8 @@ class LayoutOptions:
         ]
         if self.height is not None:
             args.append(f'--height={self.height}')
+        if self.tmux is not None:
+            args.append(f'--tmux={self.tmux}')
         if self.border_label is not None:
             args.append(f'--border-label={self.border_label}')
         if self.separator is not None:
@@ -657,6 +711,8 @@ class LayoutOptions:
             args.append(f'--pointer={self.pointer}')
         if self.marker is not None:
             args.append(f'--marker={self.marker}')
+        if self.marker_multi_line is not None:
+            args.append(f'--marker-multi-line={self.marker_multi_line}')
         if self.header is not None:
             args.append(f'--header={self.header}')
         return args
@@ -861,17 +917,6 @@ class PreviewWindowBorderType(StrEnum):
     LEFT = "border-left"
     RIGHT = "border-right"
     NONE = "border-none"
-
-
-# @dataclass(slots=True)
-# class PreviewWindow:
-#     position: PreviewWindowPosition = PreviewWindowPosition.RIGHT
-#     size: Pixels | Percent = Percent(50)
-#     border: PreviewWindowBorderType = PreviewWindowBorderType.ROUNDED
-#     wrap: bool = False
-#     follow: bool = False
-#     cycle: bool = False
-#     hidden: bool = False
 
 
 @dataclass(slots=True, kw_only=True)
