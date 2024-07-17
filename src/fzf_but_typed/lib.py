@@ -334,6 +334,7 @@ class ActionSimple(StrEnum):
     HIDE_PREVIEW = "hide-preview"
     OFFSET_DOWN = "offset-down"
     OFFSET_UP = "offset-up"
+    OFFSET_MIDDLE = "offset-middle"
     IGNORE = "ignore"
     JUMP = "jump"
     JUMP_ACCEPT = "jump-accept"
@@ -372,6 +373,7 @@ class ActionSimple(StrEnum):
     TOGGLE_SORT = "toggle-sort"
     TOGGLE_TRACK = "toggle-track"
     TOGGLE_TRACK = "toggle-track-current"
+    TOGGLE_WRAP = "toggle-wrap"
     TOGGLE_UP = "toggle+up"
     TRACK = "track-current"
     TRACK_CURRENT = "track-current"
@@ -504,6 +506,8 @@ class InterfaceOptions:
     no_mouse: bool = False   # --no-mouse
     bind: list[Binding] | None = None   # --bind
     cycle: bool = False   # --cycle
+    wrap: bool = False   # --wrap
+    wrap_sign: str | None = None   # --wrap-sign
     keep_right: bool = False   # --keep-right
     scroll_off: int = 3   # --scroll-off
     no_hscroll: bool = False   # --no-hscroll
@@ -515,6 +519,7 @@ class InterfaceOptions:
         args = [
             '--multi' if self.multi else '--no-multi',
             '--cycle' if self.cycle else '--no-cycle',
+            '--wrap' if self.wrap else '--no-wrap',
             '--keep-right' if self.keep_right else '--no-keep-right',
             f'--scroll-off={self.scroll_off}',
             '--no-hscroll' if self.no_hscroll else '--hscroll',
@@ -524,9 +529,11 @@ class InterfaceOptions:
         if self.no_mouse:
             args.append('--no-mouse')
         if self.bind is not None:
-            args.append(f'--bind={",".join(str(b) for b in self.bind)}')
+            args.append(f'--bind={",".join(str(b) for b in self.bind)!r}')
+        if self.wrap_sign is not None:
+            args.append(f'--wrap-sign={self.wrap_sign!r}')
         if self.jump_labels is not None:
-            args.append(f'--jump-labels={",".join(self.jump_labels)}')
+            args.append(f'--jump-labels={",".join(self.jump_labels)!r}')
         return args
 
 
@@ -669,6 +676,7 @@ class LayoutOptions:
     margin: Sides = Sides()
     padding: Sides = Sides()
     info: LayoutInfoStyle = LayoutInfoStyle.DEFAULT
+    info_command: str | None = None
     separator: str | None = None
     scrollbar: str | None = None
     prompt: str | None = None
@@ -701,8 +709,10 @@ class LayoutOptions:
             args.append(f'--tmux={self.tmux}')
         if self.border_label is not None:
             args.append(f'--border-label={self.border_label}')
+        if self.info_command is not None:
+            args.append(f'--info-command={self.info_command!r}')
         if self.separator is not None:
-            args.append(f'--separatpr={self.separator}')
+            args.append(f'--separator={self.separator}')
         if self.scrollbar is not None:
             args.append(f'--scrollbar={self.scrollbar}')
         if self.prompt is not None:
